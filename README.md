@@ -4,20 +4,19 @@ This is an example TypeScript codebase that demonstrates how to use the ChatGPT 
 
 ## Requirements
 
-```
-Node.js version >= 18.0.0
-Redis server (for storing message queue)
-```
+- Node.js version >= 18.0.0
+- Redis server (for storing message queue)
 
 ## Installation
 
-Clone this repository
-Run npm install to install the dependencies
+```shell
+npm install
+```
 
 ## Usage
 
 1. Start a Redis server.\
-   You can download Redis from the official website, or use a cloud service like Redis
+   You can download Redis from the [official website](https://redis.io/download/), or use a cloud service like Redis
 
 2. Rename the .env.example file to .env and fill in the required information
    ```bash
