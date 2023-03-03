@@ -180,6 +180,8 @@ export class TGWrapper {
       async (job: { data: TelegramBot.Message }, done: any) => {
         try {
           const msg = job.data;
+          const typing = await this.bot.sendMessage(msg.chat.id, `typing...`);
+
           const chatGPTAnswer = await oraPromise(
             this.chatAPI.sendMessage(msg.text!),
             {
@@ -189,13 +191,13 @@ export class TGWrapper {
 
           // send the response back to the user
           const botResult = await oraPromise(
-            this.bot.sendMessage(
-              msg.chat.id,
-              `Hi ${msg.from!.first_name}! Below is my answers: \n
-                ${chatGPTAnswer.text}
-              `,
+            this.bot.editMessageText(
+              `🤖 Hi ${msg.from!.first_name}! Below is my answers 🤖: \n\n ${
+                chatGPTAnswer.text
+              }`,
               {
-                reply_to_message_id: msg.chat.id,
+                chat_id: msg.chat.id,
+                message_id: typing.message_id,
               }
             ),
             {
@@ -203,11 +205,13 @@ export class TGWrapper {
             }
           );
 
-          this.db.push(`/conversation_${msg.chat.id}`, {
-            conversationId: botResult.message_id,
-            parentMessageId: botResult.from?.id,
-            prompt: botResult.text,
-          });
+          if (typeof botResult !== "boolean") {
+            this.db.push(`/conversation_${msg.chat.id}`, {
+              conversationId: botResult.message_id,
+              parentMessageId: botResult.from?.id,
+              prompt: botResult.text,
+            });
+          }
 
           return done();
         } catch (e) {

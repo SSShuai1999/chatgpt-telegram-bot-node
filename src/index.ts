@@ -4,7 +4,7 @@ import * as dotenv from "dotenv";
 import { TGWrapper } from "./telegram";
 import Queue from "bee-queue";
 import { JsonDB, Config } from "node-json-db";
-
+import proxyAgent from "https-proxy-agent";
 dotenv.config();
 
 async function main() {
@@ -19,6 +19,18 @@ async function main() {
     // get your Telegram Bot token from BotFather and OpenAI API key
     apiKey: process.env.OPENAI_API_KEY!,
     debug: false,
+    fetch: (url, options = {}) => {
+      const defaultOptions = {
+        agent: proxyAgent("https://chat.duti.tech/api/conversation"),
+      };
+
+      const mergedOptions = {
+        ...defaultOptions,
+        ...options,
+      };
+
+      return fetch(url, mergedOptions);
+    },
   });
 
   // Tasks used to monitor and process chatgpt
